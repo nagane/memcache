@@ -8,7 +8,7 @@ HERE        = File.expand_path(File.dirname(__FILE__))
 BUNDLE      = Dir.glob("libmemcached-*.tar.gz").first
 BUNDLE_PATH = BUNDLE.sub(".tar.gz", "")
 
-$CXXFLAGS = " -std=gnu++0x -fPIC"
+#$CXXFLAGS = " -std=c++11 -fPIC"
 
 def copy_gem(gem_dir)
   Dir.chdir("#{HERE}/#{gem_dir}") do
@@ -38,10 +38,11 @@ if !ENV["EXTERNAL_LIB"]
       raise "'#{cmd}' failed" unless system(cmd)
 
       Dir.chdir(BUNDLE_PATH) do
-        puts(cmd = "./configure --prefix=#{HERE} --without-memcached --disable-dependency-tracking #{ARGV.join(' ')} 2>&1")
+        puts(cmd = "./configure --prefix=#{HERE} --without-memcached --disable-dependency-tracking CXXFLAGS=-std=c++11 #{ARGV.join(' ')} 2>&1")
         raise "'#{cmd}' failed" unless system(cmd)
 
-        puts(cmd = "make CXXFLAGS=\"$CXXFLAGS #{$CXXFLAGS}\" 2>&1")
+        #puts(cmd = "make CXXFLAGS=\"$CXXFLAGS #{$CXXFLAGS}\" 2>&1")
+        puts(cmd = "make CXXFLAGS=\"-std=c++11 -fpermissive -fPIC\" 2>&1")
         raise "'#{cmd}' failed" unless system(cmd)
 
         puts(cmd = "make install 2>&1")
@@ -68,6 +69,7 @@ end
 # thanks to: https://gist.github.com/IanVaughan/5489431
 $CPPFLAGS += " -DRUBY_19" if RUBY_VERSION =~ /1.9/
 $CPPFLAGS += " -DRUBY_20" if RUBY_VERSION =~ /2.0/
+$CPPFLAGS += " -DRUBY_25" if RUBY_VERSION =~ /2.5/
 
 puts "*** Using Ruby version: #{RUBY_VERSION}"
 puts "*** with CPPFLAGS: #{$CPPFLAGS}"
